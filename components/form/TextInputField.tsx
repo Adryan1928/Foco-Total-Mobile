@@ -7,13 +7,11 @@ import FieldWrapper from "./FieldWrapper";
 export interface TextInputFieldProps extends TextInputProps {
   name: string;
   control: Control<any>;
-  caption?: string;
 }
 
 export default function TextInputField({
   name,
   control,
-  caption,
   disabled,
   onChangeText,
   ...rest

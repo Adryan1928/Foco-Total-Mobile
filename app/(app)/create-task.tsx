@@ -1,70 +1,88 @@
-import { StyleSheet, View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { Button, Text } from 'react-native-paper';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { clearLoggedIn } from '@/storage/auth';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useForm } from 'react-hook-form';
+import TextInputField from '@/components/form/TextInputField';
+import * as Yup from 'yup';
+import DatePickerField from '@/components/form/DatePickerField';
+import CheckBoxField from '@/components/form/CheckBoxField';
+import { Button } from 'react-native-paper';
+
+
+const Scheme = Yup.object().shape({
+  title: Yup.string().required('O título é obrigatório'),
+  description: Yup.string(),
+  dueDate: Yup.date().required('A data de vencimento é obrigatória'),
+  status: Yup.boolean(),
+});
 
 export default function CreateTaskScreen() {
   const router = useRouter();
 
-  async function handleLogout() {
-    await clearLoggedIn();
-    router.replace('/auth/login');
+  const { control, handleSubmit } = useForm({
+    mode: "onSubmit",
+    defaultValues: {
+      title: '',
+      description: '',
+      dueDate: new Date(),
+      status: false,
     }
+  });
+
+  const handleCreateTask = (data: any) => {
+    console.log("Creating task with data:", data);
+    router.back();
+  }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <ScrollView
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={styles.container}
       >
-        <View style={styles.inner}>
-          
-            <Text variant="headlineMedium" style={styles.title}>
-                Foco Total
-            </Text>
-            <Button mode="outlined" onPress={handleLogout} style={styles.button}>
-              Sair
-            </Button>
+        <View style={styles.form}>
+          <TextInputField
+            name="title"
+            label="Título"
+            placeholder="Digite o título da tarefa"
+            control={control}
+          />
+          <TextInputField
+            name="description"
+            label="Descrição"
+            placeholder="Digite a descrição da tarefa"
+            control={control}
+            multiline
+            numberOfLines={4}
+          />
+          <DatePickerField
+            name="dueDate"
+            label="Data de Vencimento"
+            placeholder="Selecione a data de vencimento"
+            control={control}
+          />
+          <CheckBoxField
+            name="status"
+            label="Concluída"
+            control={control}
+          />
         </View>
+
+        <Button onPress={handleSubmit(handleCreateTask)} mode="contained">
+          Criar Tarefa
+        </Button>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#fff',
+    padding: 16,
+    minHeight: '100%',
   },
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  inner: {
+  form: {
     flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 48,
-  },
-  titleContainer: {
-    marginBottom: 48,
-  },
-  title: {
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  subtitle: {
-    textAlign: 'center',
-    color: '#6b6b6b',
-    marginTop: 4,
-  },
-  formContainer: {
-    gap: 24,
-  },
-  button: {
-    marginTop: 16,
-    borderRadius: 8,
-    paddingVertical: 8,
+    gap: 16,
   },
 });
