@@ -1,12 +1,12 @@
 import TextInputField from '@/components/form/TextInputField';
 import { useForm } from 'react-hook-form';
-import { StyleSheet, View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import * as Yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { LoginPayload } from '@/services/auth';
 import { useRouter } from 'expo-router';
 import { setLoggedIn } from '@/storage/auth';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const schema = Yup.object().shape({
   email: Yup.string()
@@ -38,42 +38,44 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    <TouchableWithoutFeedback
+      onPress={Keyboard.dismiss}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
+      <SafeAreaView
+        style={styles.container}
       >
-        <View style={styles.inner}>
-          <View style={styles.titleContainer}>
-            <Text variant="headlineMedium" style={styles.title}>
-              Bem-vindo de volta 👋
-            </Text>
-            <Text variant="bodyMedium" style={styles.subtitle}>
-              Faça login para continuar
-            </Text>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+        >
+          <View style={styles.inner}>
+            <View style={styles.titleContainer}>
+              <Text variant="headlineMedium" style={styles.title}>
+                Bem-vindo de volta 👋
+              </Text>
+              <Text variant="bodyMedium" style={styles.subtitle}>
+                Faça login para continuar
+              </Text>
+            </View>
+            <View style={styles.formContainer}>
+              <TextInputField
+                name="email"
+                control={control}
+                label="Email"
+              />
+              <TextInputField
+                name="password"
+                control={control}
+                label="Senha"
+                secureTextEntry
+              />
+              <Button mode="contained" onPress={handleSubmit(handleLogin)} style={styles.button}>
+                Entrar
+              </Button>
+            </View>
           </View>
-
-          <View style={styles.formContainer}>
-            <TextInputField
-              name="email"
-              control={control}
-              label="Email"
-            />
-            <TextInputField
-              name="password"
-              control={control}
-              label="Senha"
-              secureTextEntry
-            />
-            <Button mode="contained" onPress={handleSubmit(handleLogin)} style={styles.button}>
-              Entrar
-            </Button>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 

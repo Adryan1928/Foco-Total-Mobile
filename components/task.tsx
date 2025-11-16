@@ -1,13 +1,18 @@
 import React, { useState } from "react";
 import { View, StyleSheet, TouchableWithoutFeedback } from "react-native";
-import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Task as TaskType } from "@/services/task";
 import { Text, RadioButton, Icon } from "react-native-paper";
+import { useRouter } from "expo-router";
+import { SwipeableRef } from "react-native-gesture-handler/lib/typescript/components/ReanimatedSwipeable/ReanimatedSwipeable";
 
 
 export function Task(task: TaskType) {
+    const router = useRouter();
     const [checked, setChecked] = useState<boolean>(task.status);
+
+    const taskRef = React.useRef<SwipeableMethods>(null);
 
     const handleChangeStatus = () => {
         setChecked(!checked);
@@ -16,6 +21,7 @@ export function Task(task: TaskType) {
     return (
         <GestureHandlerRootView>
             <Swipeable
+                ref={taskRef}
                 renderRightActions={() => 
                     <View style={styles.containerDelete}>
                         <Icon
@@ -35,17 +41,18 @@ export function Task(task: TaskType) {
                     </View>
                 )}
                 onSwipeableOpen={(direction) => {
+                    taskRef.current?.reset();
                     if (direction === 'left') {
                         console.log(`Delete task with id: ${task.id}`);
                     } else {
-                        console.log(`Edit task with id: ${task.id}`);
+                        router.push(`/task/${task.id}`);
                     }
                 }}
                 containerStyle={styles.container}
             >
                 <TouchableWithoutFeedback
                     onPress={() => {
-                        console.log("Rodou")
+                        router.push(`/task/${task.id}`);
                     }}
                 >
                     <View

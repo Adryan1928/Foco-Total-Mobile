@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm } from 'react-hook-form';
@@ -35,43 +35,47 @@ export default function CreateTaskScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-      >
-        <View style={styles.form}>
-          <TextInputField
-            name="title"
-            label="Título"
-            placeholder="Digite o título da tarefa"
-            control={control}
-          />
-          <TextInputField
-            name="description"
-            label="Descrição"
-            placeholder="Digite a descrição da tarefa"
-            control={control}
-            multiline
-            numberOfLines={4}
-          />
-          <DatePickerField
-            name="dueDate"
-            label="Data de Vencimento"
-            placeholder="Selecione a data de vencimento"
-            control={control}
-          />
-          <CheckBoxField
-            name="status"
-            label="Concluída"
-            control={control}
-          />
-        </View>
-
-        <Button onPress={handleSubmit(handleCreateTask)} mode="contained">
-          Criar Tarefa
-        </Button>
-      </ScrollView>
-    </SafeAreaView>
+    <TouchableWithoutFeedback
+      onPress={Keyboard.dismiss}
+    >
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+        <ScrollView
+          contentContainerStyle={styles.container}
+        >
+          <View style={styles.form}>
+            <TextInputField
+              name="title"
+              label="Título"
+              placeholder="Digite o título da tarefa"
+              control={control}
+            />
+            <TextInputField
+              name="description"
+              label="Descrição"
+              placeholder="Digite a descrição da tarefa"
+              control={control}
+              multiline
+              numberOfLines={4}
+            />
+            <DatePickerField
+              name="dueDate"
+              label="Data de Vencimento"
+              placeholder="Selecione a data de vencimento"
+              control={control}
+              editable
+            />
+            <CheckBoxField
+              name="status"
+              label="Concluída"
+              control={control}
+            />
+          </View>
+          <Button onPress={handleSubmit(handleCreateTask)} mode="contained">
+            Criar Tarefa
+          </Button>
+        </ScrollView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 

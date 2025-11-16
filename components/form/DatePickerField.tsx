@@ -13,6 +13,7 @@ export default function DatePickerField({
   name,
   control,
   disabled,
+  editable,
   ...rest
 }: DatePickerFieldProps) {
   const { field, fieldState } = useController({
@@ -33,7 +34,7 @@ export default function DatePickerField({
         <>
           <TextInput
             value={formattedValue}
-            onPressIn={() => !disabled && setOpen(true)}
+            onPressIn={() => !disabled && editable && setOpen(true)}
             editable={false}
             disabled={disabled}
             error={hasError}
