@@ -1,8 +1,10 @@
 import { useAuthStatus } from '@/hooks/useAuthStatus';
+import { clearLoggedIn } from '@/storage/auth';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, StatusBar, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import 'react-native-reanimated';
+import { IconButton } from 'react-native-paper';
 
 
 export default function RootLayout() {
@@ -29,6 +31,11 @@ export default function RootLayout() {
       router.replace('/(app)');
     }
   }, [segments, isLoggedIn]);
+
+  async function handleLogout() {
+    await clearLoggedIn();
+    router.replace('/auth/login');
+  }
   
   if (isLoggedIn === null) {
     return (
@@ -40,8 +47,24 @@ export default function RootLayout() {
 
   return (
     <>
-        <Stack>
-            <Stack.Screen name="index" options={{headerShown:false}}/>
+        <Stack screenOptions={{
+            headerRight: () => (
+                isLoggedIn && (
+                  <View style={{ justifyContent: 'center', alignItems: 'center', height: 32,}}>
+                    <IconButton
+                        onPress={handleLogout}
+                        icon="logout"
+                        iconColor='#d03737'
+                        size={24}
+                        style={{ backgroundColor: "white" }}
+                    />
+                  </View>
+                )
+            )
+        }}>
+            <Stack.Screen name="index" options={{
+              title: "Home"
+            }}/>
             <Stack.Screen name="create-task" options={{
                 title: "Criar tarefa"
             }} />

@@ -80,9 +80,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 16,
     minHeight: '100%',
+    gap: 32,
   },
   form: {
-    flex: 1,
-    gap: 16,
+    gap: 24,
   },
 });

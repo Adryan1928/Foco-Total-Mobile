@@ -1,7 +1,6 @@
-import { StyleSheet, View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import { Button, Card, ProgressBar, Text, IconButton, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import { clearLoggedIn } from '@/storage/auth';
 import { Task } from '@/components/task';
 import { Task as TaskType } from '@/services/task';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,11 +8,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function HomeScreen() {
   const router = useRouter();
   const theme = useTheme();
-
-  async function handleLogout() {
-    await clearLoggedIn();
-    router.replace('/auth/login');
-  }
 
   const today = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
   const tasks: TaskType[] = [
