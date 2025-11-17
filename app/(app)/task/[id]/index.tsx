@@ -14,6 +14,7 @@ import { TaskPayload } from "@/services/task";
 import { IconButton, Text, useTheme, Divider, Surface } from "react-native-paper";
 import DatePickerField from "@/components/form/DatePickerField";
 import CheckBoxField from "@/components/form/CheckBoxField";
+import { useGetTask, useUpdateTaskMutation } from "@/hooks/tasks";
 
 export default function EditViewTaskScreen () {
   const router = useRouter();
@@ -22,18 +23,29 @@ export default function EditViewTaskScreen () {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const task = { 
-    id: "1", 
-    title: 'Estudar React Native', 
-    status: true, 
-    dueDate: new Date(), 
-    description: 'asdbashdvashdvasdvsagdvasgdvasvsagdvsagdvashgdvas' 
-  };
+  const { data: task } = useGetTask(id);
 
-  const { control } = useForm<TaskPayload>({
+  const { control, handleSubmit } = useForm<TaskPayload>({
     mode: "onSubmit",
     defaultValues: { ...task }
   });
+
+  const updateTaskMutation = useUpdateTaskMutation();
+
+  const onSubmit = (values: TaskPayload) => {
+    updateTaskMutation.mutate({
+      ...values,
+      status: (values.status ? 'completed' : 'pending'),
+      id
+    }, {
+      onSuccess: () => {
+        alert('Tarefa atualizada com sucesso!');
+        setMode('view');
+      }
+    });
+  }
+
+  console.log(task);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -109,9 +121,11 @@ export default function EditViewTaskScreen () {
           <IconButton
             icon={mode === 'view' ? "note-edit" : "check"}
             size={28}
-            onPress={() => {
+            onPress={(values) => {
               setMode(mode === 'view' ? 'edit' : 'view');
               Keyboard.dismiss();
+              if (mode === 'view') return;
+              handleSubmit(onSubmit)(values);
             }}
             iconColor="white"
           />

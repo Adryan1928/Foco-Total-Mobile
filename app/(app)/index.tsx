@@ -1,36 +1,25 @@
 import { StyleSheet, View, ScrollView } from 'react-native';
-import { Button, Card, ProgressBar, Text, IconButton, useTheme } from 'react-native-paper';
+import { Card, ProgressBar, Text, IconButton, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { Task } from '@/components/task';
 import { Task as TaskType } from '@/services/task';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useGetTasks } from '@/hooks/tasks';
 
 export default function HomeScreen() {
   const router = useRouter();
   const theme = useTheme();
 
   const today = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-  const tasks: TaskType[] = [
-    { id: "1", title: 'Estudar React Native', status: true, dueDate: new Date(), description: '' },
-    { id: "2", title: 'Revisar design do app', status: false, dueDate: new Date(), description: '' },
-    { id: "3", title: 'Enviar relatório semanal', status: false, dueDate: new Date('2025-11-14'), description: '' },
-    // { id: "4", title: 'Estudar React Native', status: true, dueDate: new Date(), description: '' },
-    // { id: "5", title: 'Revisar design do app', status: false, dueDate: new Date(), description: '' },
-    // { id: "6", title: 'Enviar relatório semanal', status: false, dueDate: new Date('2025-11-14'), description: '' },
-    // { id: "7", title: 'Estudar React Native', status: true, dueDate: new Date(), description: '' },
-    // { id: "8", title: 'Revisar design do app', status: false, dueDate: new Date(), description: '' },
-    // { id: "9", title: 'Enviar relatório semanal', status: false, dueDate: new Date('2025-11-14'), description: '' },
-    // { id: "10", title: 'Estudar React Native', status: true, dueDate: new Date(), description: '' },
-    // { id: "11", title: 'Revisar design do app', status: false, dueDate: new Date(), description: '' },
-    // { id: "12", title: 'Enviar relatório semanal', status: false, dueDate: new Date('2025-11-14'), description: '' },
-    // { id: "13", title: 'Estudar React Native', status: true, dueDate: new Date(), description: '' },
-    // { id: "14", title: 'Revisar design do app', status: false, dueDate: new Date(), description: '' },
-    // { id: "15", title: 'Enviar relatório semanal', status: false, dueDate: new Date('2025-11-14'), description: '' },
-  ];
+  const { data: tasks } = useGetTasks();
+
+  if (tasks == undefined) {
+    return null;
+  }
 
 
-  const todayTasks = tasks.filter(t => t.dueDate.toDateString() === new Date().toDateString());
-  const doneTasks = tasks.filter(t => t.status).length;
+  const todayTasks = tasks?.filter(t => new Date(t.dueDate).toDateString() === new Date().toDateString());
+  const doneTasks = tasks?.filter(t => t.status).length;
   const progress = doneTasks / tasks.length;
 
   
@@ -51,7 +40,7 @@ export default function HomeScreen() {
             <View style={styles.taskList}>
                 <Text variant='titleMedium'>Tarefas</Text>
                 <View style={styles.containerTasks}>
-                    {todayTasks.map(task => (
+                    {tasks.map(task => (
                         <Task
                             key={task.id}
                             {...task}

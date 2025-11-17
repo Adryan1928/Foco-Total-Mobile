@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { View, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -6,16 +6,37 @@ import { Task as TaskType } from "@/services/task";
 import { Text, RadioButton, Icon } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { SwipeableRef } from "react-native-gesture-handler/lib/typescript/components/ReanimatedSwipeable/ReanimatedSwipeable";
+import { useDeleteTaskMutation, useUpdateTaskMutation } from "@/hooks/tasks";
 
 
 export function Task(task: TaskType) {
     const router = useRouter();
-    const [checked, setChecked] = useState<boolean>(task.status);
+    const [checked, setChecked] = useState<boolean>(task.status == 'completed');
 
     const taskRef = React.useRef<SwipeableMethods>(null);
 
+    const updateTaskMutation = useUpdateTaskMutation();
+    const deleteTaskMutation = useDeleteTaskMutation();
+
     const handleChangeStatus = () => {
-        setChecked(!checked);
+        updateTaskMutation.mutate({
+            ...task,
+            status: !checked ? 'completed' : 'pending',
+        },
+        {
+            onSuccess: () => {
+                setChecked(!checked);
+            }
+        }
+        );
+    }
+
+    const handleDeleteTask = () => {
+        deleteTaskMutation.mutate(task.id, {
+            onSuccess: () => {
+                console.log('Task deleted successfully');
+            }
+        });
     }
 
     return (
@@ -43,7 +64,7 @@ export function Task(task: TaskType) {
                 onSwipeableOpen={(direction) => {
                     taskRef.current?.reset();
                     if (direction === 'left') {
-                        console.log(`Delete task with id: ${task.id}`);
+                        handleDeleteTask();
                     } else {
                         router.push(`/task/${task.id}`);
                     }
@@ -71,7 +92,7 @@ export function Task(task: TaskType) {
                                 <Text variant="labelLarge">{task.title}</Text>
                             </View>
                             <View>
-                                <Text>{task.dueDate.toDateString()}</Text>
+                                <Text>{new Date(task.dueDate).toLocaleDateString("pt-BR")}</Text>
                             </View>
                         </View>
                     </View>

@@ -3,8 +3,8 @@ import request from "@/utils/request";
 export interface TaskPayload {
   title: string;
   description?: string;
-  status: boolean;
-  dueDate: Date;
+  status: string;
+  dueDate: string;
 }
 
 export interface Task extends TaskPayload {
@@ -18,8 +18,8 @@ export const createTask = (task: TaskPayload) =>
 export const getTask = (id: string) => 
   request.get<Task>(`/tasks/${id}/`);
 
-export const updateTask = (id: string, task: TaskPayload) => 
-  request.patch<Task>(`/tasks/${id}/`, task);
+export const updateTask = (task: TaskPayload & { id: string }) => 
+  request.patch<Task>(`/tasks/${task.id}/`, task);
 
 export const deleteTask = (id: string) => 
   request.delete<void>(`/tasks/${id}/`);

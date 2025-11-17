@@ -28,7 +28,7 @@ function onError(error: Error | AxiosError) {
 }
 
 const request = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL,
+  baseURL: "http://192.168.1.101:3000/api",
   responseType: "json",
   withCredentials: true,
 });
@@ -37,7 +37,7 @@ request.interceptors.request.use(async (config) => {
 
   const token = await getAuthToken();
   if (token) {
-    config.headers.Authorization = `Token ${token}`;
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
   return config;

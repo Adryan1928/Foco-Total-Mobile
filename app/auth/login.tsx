@@ -1,5 +1,5 @@
 import TextInputField from '@/components/form/TextInputField';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 import { StyleSheet, View, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import * as Yup from 'yup';
@@ -7,6 +7,8 @@ import { LoginPayload } from '@/services/auth';
 import { useRouter } from 'expo-router';
 import { setLoggedIn } from '@/storage/auth';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useLoginMutation } from '@/hooks/auth';
 
 const schema = Yup.object().shape({
   email: Yup.string()
@@ -15,26 +17,37 @@ const schema = Yup.object().shape({
     .max(254)
     .required("Obrigatório")
     .trim(),
-  password: Yup.string().min(8, "Mínimo de 8 caracteres").required("Obrigatório"),
+  password: Yup.string().min(6, "Mínimo de 6 caracteres").required("Obrigatório"),
 });
 
 export default function LoginScreen() {
   const router = useRouter();
 
 
-  const { control, handleSubmit } = useForm<LoginPayload>({
+  const { control, handleSubmit, setError } = useForm<LoginPayload>({
     mode: 'onSubmit',
     defaultValues: {
       email: '',
       password: '',
     },
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(schema),
   });
 
+  const loginMutation = useLoginMutation();
+
   const handleLogin = async (data: LoginPayload) => {
-    console.log(data);
-    await setLoggedIn(true)
-    router.replace('/(app)');
+    loginMutation.mutate({
+      ...data
+    },
+    {
+      onSuccess: () => {
+        setLoggedIn(true);
+        router.replace('/(app)');
+      },
+      onError: (error) => {
+        setError('password', { type: 'manual', message: 'Email ou senha inválidos' });
+      }
+    });
   };
 
   return (
@@ -68,8 +81,8 @@ export default function LoginScreen() {
                 label="Senha"
                 secureTextEntry
               />
-              <Button mode="contained" onPress={handleSubmit(handleLogin)} style={styles.button}>
-                Entrar
+              <Button mode="contained" onPress={handleSubmit(handleLogin)} style={styles.button} disabled={loginMutation.isPending}>
+                {loginMutation.isPending ? 'Entrando...' : 'Entrar'}
               </Button>
             </View>
           </View>

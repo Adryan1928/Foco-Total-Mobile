@@ -68,7 +68,7 @@ export default function RootLayout() {
             <Stack.Screen name="create-task" options={{
                 title: "Criar tarefa"
             }} />
-            <Stack.Screen name="task/[id]" options={{
+            <Stack.Screen name="task/[id]/index" options={{
                 title: "Tarefa"
             }} />
         </Stack>

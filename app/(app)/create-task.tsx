@@ -7,6 +7,8 @@ import * as Yup from 'yup';
 import DatePickerField from '@/components/form/DatePickerField';
 import CheckBoxField from '@/components/form/CheckBoxField';
 import { Button } from 'react-native-paper';
+import { TaskPayload } from '@/services/task';
+import { useCreateTaskMutation } from '@/hooks/tasks';
 
 
 const Scheme = Yup.object().shape({
@@ -19,19 +21,28 @@ const Scheme = Yup.object().shape({
 export default function CreateTaskScreen() {
   const router = useRouter();
 
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit } = useForm<TaskPayload>({
     mode: "onSubmit",
     defaultValues: {
       title: '',
       description: '',
       dueDate: new Date(),
-      status: false,
+      status: "pending",
     }
   });
 
-  const handleCreateTask = (data: any) => {
-    console.log("Creating task with data:", data);
-    router.back();
+  const createTaskMutation = useCreateTaskMutation();
+
+  const handleCreateTask = (data: TaskPayload) => {
+    createTaskMutation.mutate({
+      ...data,
+      status: typeof data.status === "string" ? data.status: data.status ? 'completed' : 'pending',
+    }, {
+      onSuccess: () => {
+        alert('Tarefa criada com sucesso!');
+        router.back();
+      }
+    });
   }
 
   return (

@@ -24,7 +24,7 @@ export default function CheckboxField({
     disabled,
   });
 
-  const isChecked = !!field.value;
+  const isChecked = field.value === "completed" || field.value === true;
 
   return (
     <FieldWrapper fieldState={fieldState}>
